@@ -66,6 +66,9 @@ bool blinking_active           = false;
 #endif
 
 void leader_end_notify(bool successful);
+void rgb_matrix_blink_start(bool successful);
+void rgb_matrix_blink_end(void);
+void housekeeping_task_user(void);
 
 void leader_start_user(void) {
     // set leader key rgb to red
