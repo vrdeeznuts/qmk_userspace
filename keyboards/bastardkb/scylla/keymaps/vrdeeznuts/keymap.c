@@ -75,19 +75,19 @@ void leader_end_user(void) {
     if (leader_sequence_one_key(KC_G)) {
         SEND_STRING("github");
     } else if (leader_sequence_one_key(KC_C)) {
-        SEND_STRING(SS_TAP(KC_LGUI) SS_DELAY(250) "calc" SS_TAP(KC_ENT));
+        SEND_STRING(SS_TAP(X_LGUI) SS_DELAY(250) "calc" SS_TAP(X_ENT));
     } else if (leader_sequence_one_key(KC_D)) {
-        SEND_STRING(SS_TAP(KC_LGUI) SS_DELAY(250) "discord" SS_TAP(KC_ENT));
+        SEND_STRING(SS_TAP(X_LGUI) SS_DELAY(250) "discord" SS_TAP(X_ENT));
     } else if (leader_sequence_one_key(KC_Y)) {
-        SEND_STRING(SS_LCTL("l") SS_DELAY(100) SS_LCTL("a") SS_DELAY(100) "www.youtube.com" SS_TAP(KC_ENT));
+        SEND_STRING(SS_LCTL("l") SS_DELAY(100) SS_LCTL("a") SS_DELAY(100) "www.youtube.com" SS_TAP(X_ENT));
     } else if (leader_sequence_one_key(KC_S)) {
-        SEND_STRING(SS_TAP(KC_LGUI) SS_DELAY(250) "steam" SS_TAP(KC_ENT));
+        SEND_STRING(SS_TAP(X_LGUI) SS_DELAY(250) "steam" SS_TAP(X_ENT));
     } else if (leader_sequence_one_key(KC_O)) {
-        SEND_STRING(SS_TAP(KC_LGUI) SS_DELAY(250) "obs" SS_TAP(KC_ENT));
+        SEND_STRING(SS_TAP(X_LGUI) SS_DELAY(250) "obs" SS_TAP(X_ENT));
     } else if (leader_sequence_one_key(KC_V)) {
-        SEND_STRING(SS_TAP(KC_LGUI) SS_DELAY(250) "vscode" SS_TAP(KC_ENT));
+        SEND_STRING(SS_TAP(X_LGUI) SS_DELAY(250) "vscode" SS_TAP(X_ENT));
     } else if (leader_sequence_two_keys(KC_L, KC_C)) {
-        SEND_STRING(SS_LCTL("l") SS_DELAY(100) SS_LCTL("a") SS_DELAY(100) "www.leetcode.com" SS_TAP(KC_ENT));
+        SEND_STRING(SS_LCTL("l") SS_DELAY(100) SS_LCTL("a") SS_DELAY(100) "www.leetcode.com" SS_TAP(X_ENT));
     } else {
         success = false;
     }
