@@ -57,6 +57,7 @@
 // void dance_macro_finished(tap_dance_state_t *state, void *user_data);
 
 // Leader Key Sequences with RGB indicator
+// leader key: top left key on left thumb cluster
 #ifdef RGB_MATRIX_ENABLE
 uint8_t old_mode               = 0;
 HSV old_hsv                    = {HSV_OFF};
