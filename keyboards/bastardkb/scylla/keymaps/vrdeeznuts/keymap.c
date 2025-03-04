@@ -94,6 +94,7 @@ void leader_end_user(void) {
     leader_end_notify(success);
 }
 
+void leader_end_notify(bool successful);
 void leader_end_notify(bool successful) {
 #ifdef RGB_MATRIX_ENABLE
     rgb_matrix_blink_start(successful);
