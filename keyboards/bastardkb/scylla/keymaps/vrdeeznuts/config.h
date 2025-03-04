@@ -8,3 +8,9 @@
 
 // enable permissive hold
 #define PERMISSIVE_HOLD
+
+// leader key sequence timeout (ms)
+#define LEADER_TIMEOUT 350
+
+// disable timeout just for leader key
+#define LEADER_NO_TIMEOUT
