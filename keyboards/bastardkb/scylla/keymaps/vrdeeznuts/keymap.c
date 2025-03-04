@@ -60,7 +60,7 @@
 #ifdef RGB_MATRIX_ENABLE
 uint8_t old_mode               = 0;
 HSV old_hsv                    = {HSV_OFF};
-uit32_t rgb_matrix_blink_timer = 0;
+uint32_t rgb_matrix_blink_timer = 0;
 bool blinking_active           = false;
 #endif
 
