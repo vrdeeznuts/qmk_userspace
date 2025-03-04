@@ -65,6 +65,8 @@ uint32_t rgb_matrix_blink_timer = 0;
 bool blinking_active           = false;
 #endif
 
+void leader_end_notify(bool successful);
+
 void leader_start_user(void) {
     // set leader key rgb to red
     rgb_matrix_set_color(28, RGB_RED);
@@ -94,7 +96,6 @@ void leader_end_user(void) {
     leader_end_notify(success);
 }
 
-void leader_end_notify(bool successful);
 void leader_end_notify(bool successful) {
 #ifdef RGB_MATRIX_ENABLE
     rgb_matrix_blink_start(successful);
