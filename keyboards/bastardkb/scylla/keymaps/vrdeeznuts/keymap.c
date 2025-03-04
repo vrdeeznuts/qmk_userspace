@@ -16,6 +16,7 @@
  */
 
 #include QMK_KEYBOARD_H
+#include "rgb_matrix.h"
 
 // left hand home row mod aliases
 #define GUI_A LGUI_T(KC_A)
@@ -55,12 +56,21 @@
 // void dance_macro_finished(tap_dance_state_t *state, void *user_data);
 // void dance_macro_finished(tap_dance_state_t *state, void *user_data);
 
-// Leader Key Sequences
+// Leader Key Sequences with RGB indicator
+#ifdef RGB_MATRIX_ENABLE
+uint8_t old_mode               = 0;
+HSV old_hsv                    = {HSV_OFF};
+uit32_t rgb_matrix_blink_timer = 0;
+bool blinking_active           = false;
+#endif
+
 void leader_start_user(void) {
-    // do nothing for now
+    // set leader key rgb to red
+    rgb_matrix_set_color(28, RGB_RED);
 }
 
 void leader_end_user(void) {
+    bool success = true;
     if (leader_sequence_one_key(KC_G)) {
         SEND_STRING("github");
     } else if (leader_sequence_one_key(KC_C)) {
@@ -77,8 +87,51 @@ void leader_end_user(void) {
         SEND_STRING(SS_TAP(KC_LGUI) SS_DELAY(250) "vscode" SS_TAP(KC_ENT));
     } else if (leader_sequence_two_keys(KC_L, KC_C)) {
         SEND_STRING(SS_LCTL("l") SS_DELAY(100) SS_LCTL("a") SS_DELAY(100) "www.leetcode.com" SS_TAP(KC_ENT));
+    } else {
+        success = false;
+    }
+    leader_end_notify(success);
+}
+
+void leader_end_notify(bool successful) {
+#ifdef RGB_MATRIX_ENABLE
+    rgb_matrix_blink_start(successful);
+#endif
+}
+
+void rgb_matrix_blink_start(bool successful) {
+    old_mode = rgb_matrix_get_mode();
+    old_hsv = rgb_matrix_get_hsv();
+
+    rgb_matrix_mode_noeeprom(RGB_GREEN);
+    if (successful) {
+        rgb_matrix_sethsv_noeeprom(HSV_GREEN);
+    } else {
+        rgb_matrix_sethsv_noeeprom(HSV_RED);
+    }
+
+    rgb_matrix_blink_timer = timer_read32();
+    blinking_active = true;
+}
+
+void rgb_matrix_blink_end(void) {
+    rgb_matrix_mode_noeeprom(old_mode);
+    rgb_matrix_sethsv_noeeprom(old_hsv.h, old_hsv.s, old_hsv.v);
+
+    blinking_active = false;
+}
+
+void housekeeping_task_user(void) {
+    if (blinking_active && timer_elapsed32(rgb_matrix_blink_timer) >= RGB_MATRIX_BLINK_INTERVAL) {
+        rgb_matrix_blink_end();
     }
 }
+
+// key override shift bspc = del
+const key_override_t delete_key_override = ko_make_basic(MOD_MASK_SHIFT, KC_BSPC, KC_DEL);
+const key_override_t *key_overrides[] = {
+    &delete_key_override
+};
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
@@ -98,7 +151,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                              KC_LCTL, KC_Z, KC_X, KC_C, KC_V, KC_B, KC_N, KC_M, KC_COMM, KC_DOT, KC_SLSH, KC_BSLS,
                              //-------------------------------------------------//-----------------------------------------------------------//
                              //THUMB CLUSTERS ROW 1, ROW 2//
-                             QK_LEAD, KC_SPC, MO(1), MO(2), KC_UP, KC_RGHT, KC_ENT, KC_DEL, KC_LEFT, KC_DOWN),
+                             QK_LEAD, KC_SPC, LT(1, KC_SPC), LT(2, KC_SPC), KC_UP, KC_RGHT, KC_ENT, KC_DEL, KC_LEFT, KC_DOWN),
 
     [1] = LAYOUT_split_4x6_5(KC_TILD, KC_EXLM, KC_AT, KC_HASH, KC_DLR, KC_PERC, KC_CIRC, KC_AMPR, KC_ASTR, KC_LPRN, KC_RPRN, KC_DEL,
                              //---------------------------------------------------------//-----------------------------------------------------------//
