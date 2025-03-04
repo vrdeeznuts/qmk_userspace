@@ -40,7 +40,7 @@ typedef enum {
     TD_DOUBLE_SINGLE_TAP, // Send two single taps
     TD_TRIPLE_TAP,
     TD_TRIPLE_HOLD
-};
+} td_state_t;
 
 typedef struct {
     bool is_press_action;
