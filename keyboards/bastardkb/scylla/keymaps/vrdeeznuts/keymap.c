@@ -29,30 +29,31 @@
 #define ALT_L RALT_T(KC_L)
 #define GUI_SCLN RGUI_T(KC_SCLN)
 
-// Dynamic Macro Config
-enum {
-    TD_MACRO = 0
+// Tap Dance
+typedef enum {
+    TD_NONE,
+    TD_UNKNOWN,
+    TD_SINGLE_TAP,
+    TD_SINGLE_HOLD,
+    TD_DOUBLE_TAP,
+    TD_DOUBLE_HOLD,
+    TD_DOUBLE_SINGLE_TAP, // Send two single taps
+    TD_TRIPLE_TAP,
+    TD_TRIPLE_HOLD
 };
 
-// Dynamic Macro Playback/Start/Stop
-void dance_macro_finished(tap_dance_state_t *state, void *user_data) {
-    if (state->count == 1) {
-        dynamic_macro_play_user(1);
-    }
-    else if (state->count == 2) {
-        dynamic_macro_record_start_user(1);
-    }
-}
+typedef struct {
+    bool is_press_action;
+    td_state_t state;
+} td_tap_t;
 
-void dance_macro_reset(tap_dance_state_t *state, void *user_data) {
-    if (state->pressed) {
-        dynamic_macro_record_end_user(1);
-    }
-}
+enum {
+    DYN_MCRO,
+};
 
-tap_dance_action_t tap_dance_actions[] = {
-    [TD_MACRO] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, dance_macro_finished, dance_macro_reset)
-}
+td_state_t cur_dance(tap_dance_state_t *state);
+void dance_macro_finished(tap_dance_state_t *state, void *user_data);
+void dance_macro_finished(tap_dance_state_t *state, void *user_data);
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
@@ -72,7 +73,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                              KC_LCTL, KC_Z, KC_X, KC_C, KC_V, KC_B, KC_N, KC_M, KC_COMM, KC_DOT, KC_SLSH, KC_BSLS,
                              //-------------------------------------------------//-----------------------------------------------------------//
                              //THUMB CLUSTERS ROW 1, ROW 2//
-                             TD(TD_MACRO), KC_SPC, MO(1), MO(2), KC_UP, KC_RGHT, KC_ENT, KC_DEL, KC_LEFT, KC_DOWN),
+                             TD(DYN_MCRO), KC_SPC, MO(1), MO(2), KC_UP, KC_RGHT, KC_ENT, KC_DEL, KC_LEFT, KC_DOWN),
 
     [1] = LAYOUT_split_4x6_5(KC_TILD, KC_EXLM, KC_AT, KC_HASH, KC_DLR, KC_PERC, KC_CIRC, KC_AMPR, KC_ASTR, KC_LPRN, KC_RPRN, KC_DEL,
                              //---------------------------------------------------------//-----------------------------------------------------------//
@@ -93,4 +94,43 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                              _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, KC_VOLD,
                              //---------------------------------------------------------//--------------------------------------------------------------//
                              KC_LCTL, KC_HOME, KC_TRNS, KC_TRNS, KC_RALT, QK_BOOT, KC_SPC, KC_BSPC, KC_RCTL, KC_ENT),
+};
+
+// Dynamic Macro Playback/Start/Stop
+td_state_t cur_dance(tap_dance_state_t *state) {
+    if (state->count == 1) {
+        if (state->interrupted || !state->pressed) return TD_SINGLE_TAP;
+        else return TD_SINGLE_HOLD;
+    } else if (state->count == 2) {
+        if (state->interrupted) return TD_DOUBLE_SINGLE_TAP;
+        else if (state->pressed) return TD_DOUBLE_HOLD;
+        else return TD_DOUBLE_TAP;
+    }
+    if (state->count == 3) {
+        if (state->interrupted || !state->pressed) return TD_TRIPLE_TAP;
+        else return TD_TRIPLE_HOLD;
+    } else return TD_UNKNOWN;
+}
+
+static td_tap_t keytap_state = {
+    .is_press_action = true,
+    .state = TD_NONE
+};
+
+void dance_macro_finished(tap_dance_state_t *state, void *user_data) {
+    keytap_state.state = cur_dance(state);
+    switch (keytap_state.state) {
+        case TD_SINGLE_TAP: dynamic_macro_play_user(1); break;
+        case TD_DOUBLE_TAP: dynamic_macro_record_start_user(1); break;
+        case TD_SINGLE_HOLD: dynamic_macro_record_end_user(1); break;
+        default: break;
+    }
+}
+
+void dance_macro_reset(tap_dance_state_t *state, void *user_data) {
+    keytap_state.state = TD_NONE;
+}
+
+tap_dance_action_t tap_dance_actions[] = {
+    [DYN_MCRO] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, dance_macro_finished, dance_macro_reset)
 };
