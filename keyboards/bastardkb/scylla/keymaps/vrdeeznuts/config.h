@@ -14,3 +14,5 @@
 
 // disable timeout just for leader key
 #define LEADER_NO_TIMEOUT
+
+#define RGB_MATRIX_BLINK_INTERVAL 100

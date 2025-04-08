@@ -16,7 +16,6 @@
  */
 
 #include QMK_KEYBOARD_H
-#include "rgb_matrix.h"
 
 // left hand home row mod aliases
 #define GUI_A LGUI_T(KC_A)
@@ -58,25 +57,86 @@
 
 // Leader Key Sequences with RGB indicator
 // leader key: top left key on left thumb cluster
-#ifdef RGB_MATRIX_ENABLE
-uint8_t old_mode               = 0;
-HSV old_hsv                    = {HSV_OFF};
-uint32_t rgb_matrix_blink_timer = 0;
-bool blinking_active           = false;
-#endif
+// #ifdef RGB_MATRIX_ENABLE
+// uint8_t old_mode               = 0;
+// HSV old_hsv                    = {HSV_OFF};
+// uint32_t rgb_matrix_blink_timer = 0;
+// bool blinking_active           = false;
+// #endif
 
-void leader_end_notify(bool successful);
-void rgb_matrix_blink_start(bool successful);
-void rgb_matrix_blink_end(void);
-void housekeeping_task_user(void);
+// void leader_end_notify(bool successful);
+// void rgb_matrix_blink_start(bool successful);
+// void rgb_matrix_blink_end(void);
+// void housekeeping_task_user(void);
+
+// void rgb_matrix_blink_start(bool successful) {
+//     old_mode = rgb_matrix_get_mode();
+//     old_hsv = rgb_matrix_get_hsv();
+
+//     rgb_matrix_mode_noeeprom(RGB_MATRIX_SOLID_COLOR);
+//     if (successful) {
+//         rgb_matrix_sethsv_noeeprom(HSV_GREEN);
+//     } else {
+//         rgb_matrix_sethsv_noeeprom(HSV_RED);
+//     }
+
+//     rgb_matrix_blink_timer = timer_read32();
+//     blinking_active = true;
+// }
+
+// void rgb_matrix_blink_end(void) {
+//     rgb_matrix_mode_noeeprom(old_mode);
+//     rgb_matrix_sethsv_noeeprom(old_hsv.h, old_hsv.s, old_hsv.v);
+
+//     blinking_active = false;
+// }
+
+// void housekeeping_task_user(void) {
+//     if (blinking_active && timer_elapsed32(rgb_matrix_blink_timer) >= RGB_MATRIX_BLINK_INTERVAL) {
+//         rgb_matrix_blink_end();
+//     }
+// }
+
+// void leader_end_notify(bool successful) {
+//     #ifdef RGB_MATRIX_ENABLE
+//         rgb_matrix_blink_start(successful);
+//     #endif
+//     }
+        
+// void leader_start_user(void) {
+//     // set leader key rgb to red
+//     rgb_matrix_set_color(28, RGB_RED);
+// }
+
+// void leader_end_user(void) {
+//     bool success = true;
+//     if (leader_sequence_one_key(KC_G)) {
+//         SEND_STRING("github");
+//     } else if (leader_sequence_one_key(KC_C)) {
+//         SEND_STRING(SS_TAP(X_LGUI) SS_DELAY(250) "calc" SS_TAP(X_ENT));
+//     } else if (leader_sequence_one_key(KC_D)) {
+//         SEND_STRING(SS_TAP(X_LGUI) SS_DELAY(250) "discord" SS_TAP(X_ENT));
+//     } else if (leader_sequence_one_key(KC_Y)) {
+//         SEND_STRING(SS_LCTL("l") SS_DELAY(100) SS_LCTL("a") SS_DELAY(100) "www.youtube.com" SS_TAP(X_ENT));
+//     } else if (leader_sequence_one_key(KC_S)) {
+//         SEND_STRING(SS_TAP(X_LGUI) SS_DELAY(250) "steam" SS_TAP(X_ENT));
+//     } else if (leader_sequence_one_key(KC_O)) {
+//         SEND_STRING(SS_TAP(X_LGUI) SS_DELAY(250) "obs" SS_TAP(X_ENT));
+//     } else if (leader_sequence_one_key(KC_V)) {
+//         SEND_STRING(SS_TAP(X_LGUI) SS_DELAY(250) "vscode" SS_TAP(X_ENT));
+//     } else if (leader_sequence_two_keys(KC_L, KC_C)) {
+//         SEND_STRING(SS_LCTL("l") SS_DELAY(100) SS_LCTL("a") SS_DELAY(100) "www.leetcode.com" SS_TAP(X_ENT));
+//     } else {
+//         success = false;
+//     }
+//     leader_end_notify(success);
+// }
 
 void leader_start_user(void) {
-    // set leader key rgb to red
-    rgb_matrix_set_color(28, RGB_RED);
+    // do something
 }
 
 void leader_end_user(void) {
-    bool success = true;
     if (leader_sequence_one_key(KC_G)) {
         SEND_STRING("github");
     } else if (leader_sequence_one_key(KC_C)) {
@@ -93,43 +153,6 @@ void leader_end_user(void) {
         SEND_STRING(SS_TAP(X_LGUI) SS_DELAY(250) "vscode" SS_TAP(X_ENT));
     } else if (leader_sequence_two_keys(KC_L, KC_C)) {
         SEND_STRING(SS_LCTL("l") SS_DELAY(100) SS_LCTL("a") SS_DELAY(100) "www.leetcode.com" SS_TAP(X_ENT));
-    } else {
-        success = false;
-    }
-    leader_end_notify(success);
-}
-
-void leader_end_notify(bool successful) {
-#ifdef RGB_MATRIX_ENABLE
-    rgb_matrix_blink_start(successful);
-#endif
-}
-
-void rgb_matrix_blink_start(bool successful) {
-    old_mode = rgb_matrix_get_mode();
-    old_hsv = rgb_matrix_get_hsv();
-
-    rgb_matrix_mode_noeeprom(RGB_GREEN);
-    if (successful) {
-        rgb_matrix_sethsv_noeeprom(HSV_GREEN);
-    } else {
-        rgb_matrix_sethsv_noeeprom(HSV_RED);
-    }
-
-    rgb_matrix_blink_timer = timer_read32();
-    blinking_active = true;
-}
-
-void rgb_matrix_blink_end(void) {
-    rgb_matrix_mode_noeeprom(old_mode);
-    rgb_matrix_sethsv_noeeprom(old_hsv.h, old_hsv.s, old_hsv.v);
-
-    blinking_active = false;
-}
-
-void housekeeping_task_user(void) {
-    if (blinking_active && timer_elapsed32(rgb_matrix_blink_timer) >= RGB_MATRIX_BLINK_INTERVAL) {
-        rgb_matrix_blink_end();
     }
 }
 
