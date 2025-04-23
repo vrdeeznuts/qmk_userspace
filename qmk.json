@@ -1,6 +1,6 @@
 {
     "userspace_version": "1.0",
     "build_targets": [
-        ["bastardkb/scylla", "vrdeeznuts"],
+        ["bastardkb/scylla", "no_hrm"],
     ]
 }
